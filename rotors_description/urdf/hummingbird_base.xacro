@@ -24,6 +24,60 @@
   <!-- Instantiate hummingbird "mechanics" -->
   <xacro:include filename="$(find rotors_description)/urdf/hummingbird.xacro" />
 
+  <xacro:macro name="default_imu_aau" params="namespace parent_link">
+    <!-- ADIS16448 IMU. -->
+    <xacro:imu_plugin_macro
+      namespace="${namespace}"
+      imu_suffix=""
+      parent_link="${parent_link}"
+      imu_topic="imu"
+      mass_imu_sensor="0.00001"
+      gyroscope_noise_density="0.0003394"
+      gyroscope_random_walk="0.000038785"
+      gyroscope_bias_correlation_time="1000.0"
+      gyroscope_turn_on_bias_sigma="0.0087"
+      accelerometer_noise_density="0.004"
+      accelerometer_random_walk="0.006"
+      accelerometer_bias_correlation_time="300.0"
+      accelerometer_turn_on_bias_sigma="0.1960">
+      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+      <origin xyz="0.0192 -0.0093 0.003" rpy="0 0 0" />
+    </xacro:imu_plugin_macro>
+  </xacro:macro>
+
+  <xacro:macro name="default_pose_aau" params="namespace parent_link">
+    <!-- Mount a generic odometry sensor providing pose measurements. -->
+    <xacro:odometry_plugin_macro
+      namespace="${namespace}"
+      odometry_sensor_suffix="ps"
+      parent_link="${parent_link}"
+      pose_topic="pose_sensor/pose2"
+      pose_with_covariance_topic="pose_sensor/pose_with_covariance"
+      position_topic="pose_sensor/position"
+      transform_topic="pose_sensor/transform"
+      odometry_topic="pose_sensor/odometry"
+      parent_frame_id="world"
+      child_frame_id="${namespace}/base_link"
+      mass_odometry_sensor="0.00001"
+      measurement_divisor="2"
+      measurement_delay="0"
+      unknown_delay="0.0"
+      noise_normal_position="0.0017 0.0017 0.0017"
+      noise_normal_quaternion="0.0017 0.0017 0.0017"
+      noise_normal_linear_velocity="0 0 0"
+      noise_normal_angular_velocity="0 0 0"
+      noise_uniform_position="0 0 0"
+      noise_uniform_quaternion="0 0 0"
+      noise_uniform_linear_velocity="0 0 0"
+      noise_uniform_angular_velocity="0 0 0"
+      enable_odometry_map="false"
+      odometry_map=""
+      image_scale="">
+      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" /> <!-- [kg m^2] [kg m^2] [kg m^2] [kg m^2] [kg m^2] [kg m^2] -->
+      <origin xyz="0.026 0.038 0.0587" rpy="0.0 0.0 0.0" />
+    </xacro:odometry_plugin_macro>
+  </xacro:macro>
+
   <!-- Instantiate a controller. -->
   <xacro:controller_plugin_macro namespace="${namespace}" imu_sub_topic="imu" />
 
@@ -33,7 +87,8 @@
   </xacro:if>
 
   <!-- Mount an ADIS16448 IMU. -->
-  <xacro:default_imu namespace="${namespace}" parent_link="${namespace}/base_link" />
+  <xacro:default_imu_aau namespace="${namespace}" parent_link="${namespace}/base_link" />
+  <xacro:default_pose_aau namespace="${namespace}" parent_link="${namespace}/base_link" />
 
   <xacro:if value="$(arg enable_ground_truth)">
     <xacro:ground_truth_imu_and_odometry namespace="${namespace}" parent_link="${namespace}/base_link" />
