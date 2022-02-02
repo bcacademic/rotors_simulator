@@ -24,8 +24,8 @@
   <!-- Instantiate hummingbird "mechanics" -->
   <xacro:include filename="$(find rotors_description)/urdf/hummingbird.xacro" />
 
-  <xacro:macro name="default_imu_aau" params="namespace parent_link">
-    <!-- ADIS16448 IMU. -->
+  <xacro:macro name="fcu_imu" params="namespace parent_link">
+    <!-- Hummingbird IMU. -->
     <xacro:imu_plugin_macro
       namespace="${namespace}"
       imu_suffix=""
@@ -45,8 +45,8 @@
     </xacro:imu_plugin_macro>
   </xacro:macro>
 
-  <xacro:macro name="default_pose_aau" params="namespace parent_link">
-    <!-- Mount a generic odometry sensor providing pose measurements. -->
+  <xacro:macro name="optitrack_pose" params="namespace parent_link">
+    <!-- Mount a generic odometry sensor - Optitrack) providing pose measurements. -->
     <xacro:odometry_plugin_macro
       namespace="${namespace}"
       odometry_sensor_suffix="ps"
@@ -62,7 +62,7 @@
       measurement_divisor="2"
       measurement_delay="0"
       unknown_delay="0.0"
-      noise_normal_position="0.0017 0.0017 0.0017"
+      noise_normal_position="0.001 0.001 0.001"
       noise_normal_quaternion="0.0017 0.0017 0.0017"
       noise_normal_linear_velocity="0 0 0"
       noise_normal_angular_velocity="0 0 0"
@@ -86,9 +86,9 @@
     <xacro:default_mavlink_interface namespace="${namespace}" imu_sub_topic="imu" rotor_count="4" />
   </xacro:if>
 
-  <!-- Mount an ADIS16448 IMU. -->
-  <xacro:default_imu_aau namespace="${namespace}" parent_link="${namespace}/base_link" />
-  <xacro:default_pose_aau namespace="${namespace}" parent_link="${namespace}/base_link" />
+  <!-- Sensors of real hummingbird. -->
+  <xacro:fcu_imu namespace="${namespace}" parent_link="${namespace}/base_link" />
+  <xacro:optitrack_pose namespace="${namespace}" parent_link="${namespace}/base_link" />
 
   <xacro:if value="$(arg enable_ground_truth)">
     <xacro:ground_truth_imu_and_odometry namespace="${namespace}" parent_link="${namespace}/base_link" />
